@@ -1,3 +1,4 @@
+
 const express = require('express')
 const app = express()
 
@@ -23,6 +24,12 @@ let persons = [
         number: "39-23-6423122"
     }
   ]
+
+app.get('/info', (request, response) => {
+    const date = new Date()
+    response.send('<p>Phonebook has info for ' + persons.length + ' people</p>' +
+                 '<p>' + date + '</p>')
+})
 
 app.get('/api/persons', (request, response) => {
     response.json(persons)
