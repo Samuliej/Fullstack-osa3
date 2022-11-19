@@ -45,10 +45,22 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.post('/api/persons', (request, response) => {
     const person = request.body
-    person.id = Math.floor(Math.random() * 100000)
-    persons = persons.concat(person)
-    console.log(person)
-    response.json(person)
+    const duplicateName = persons.find(per => per.name === person.name)
+
+    if (!person.name || !person.number) {
+        response.status(400).json({
+            error: "Name or number must not be empty."
+        })
+    } else if (duplicateName) {
+        response.status(400).json({
+            error: "Name must be unique"
+        })
+    } else {
+        person.id = Math.floor(Math.random() * 100000)
+        persons = persons.concat(person)
+        console.log(person)
+        response.json(person)
+    }
 })
 
 app.delete('/api/persons/:id', (request, response) => {
