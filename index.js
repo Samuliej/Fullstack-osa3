@@ -27,7 +27,12 @@ let persons = [
     }
   ]
 
-app.use(morgan('tiny'))
+app.use(morgan(':method :url :res[content-length] - :response-time ms :postContent'))
+
+morgan.token('postContent', function(req, res) {
+    requestContent = req.body
+    return JSON.stringify(requestContent);
+})
 
 app.get('/info', (request, response) => {
     const date = new Date()
