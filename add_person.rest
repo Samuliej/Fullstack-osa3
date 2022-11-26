@@ -3,6 +3,6 @@ Content-Type: application/json
 
 {
     "id": 0,
-    "name": "fdsafdsa",
-    "number": "432"
+    "name": "Täältä Tulee TestiUkkeli",
+    "number": "0400432432"
 }
