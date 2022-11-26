@@ -30,6 +30,7 @@ let persons = [
 
 app.use(cors())
 app.use(morgan(':method :url :res[content-length] - :response-time ms :postContent'))
+app.use(express.static('build'))
 
 morgan.token('postContent', function(req, res) {
     requestContent = req.body
