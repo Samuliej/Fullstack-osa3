@@ -98,6 +98,7 @@ const unknownEndpoint = (request, response) => {
 
 app.use(unknownEndpoint)
 
+// Virheiden käsittely lisättiin samalla 3.15 tehtävän yhteydessä
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
 
