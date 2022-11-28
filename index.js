@@ -39,11 +39,13 @@ morgan.token('postContent', function(req, res) {
     return JSON.stringify(requestContent);
 })
 
-/*app.get('/info', (request, response) => {
+app.get('/info', (request, response) => {
     const date = new Date()
-    response.send('<p>Phonebook has info for ' + persons.length + ' people</p>' +
-                 '<p>' + date + '</p>')
-}) */
+    const body = response.body
+    console.log(body)
+    //response.send('<p>Phonebook has info for ' + persons.length + ' people</p>' +
+                // '<p>' + date + '</p>')
+}) 
 
 app.get('/api/persons', (request, response) => {
     Person.find({}).then(persons => {
@@ -52,7 +54,7 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    Person.findById(request.params.id).then(note => {
+    Person.findById(request.params.id).then(person => {
         response.json(person)
     })
 })
@@ -71,6 +73,7 @@ app.post('/api/persons', (request, response) => {
         }) */
      else {
         const person = new Person({
+            id: personInfo.id,
             name: personInfo.name,
             number: personInfo.number,
         })
@@ -81,11 +84,30 @@ app.post('/api/persons', (request, response) => {
     }
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    persons = persons.filter(per => per.id !== id)
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndRemove(request.params.id)
+        .then(result => {
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
+
+const unknownEndpoint = (request, response) => {
+    response.status(404).send({error: 'unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({error: 'malformatted id'})
+    }
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
