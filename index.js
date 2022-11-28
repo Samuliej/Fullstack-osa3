@@ -41,8 +41,8 @@ morgan.token('postContent', function(req, res) {
 
 app.get('/info', (request, response) => {
     const date = new Date()
-    const body = response.body
-    console.log(body)
+    const persons = Person.find({})
+    console.log(persons)
     //response.send('<p>Phonebook has info for ' + persons.length + ' people</p>' +
                 // '<p>' + date + '</p>')
 }) 
@@ -60,18 +60,13 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-    const personInfo = request.body
-    //const duplicateName = persons.find(per => per.name === personInfo.name)
+    const personInfo = request.body    
 
     if (!personInfo.name || !personInfo.number) {
         response.status(400).json({
             error: "Name or number must not be empty."
         })
-    } /*else if (duplicateName) {
-        response.status(400).json({
-            error: "Name must be unique"
-        }) */
-     else {
+    } else {
         const person = new Person({
             id: personInfo.id,
             name: personInfo.name,
@@ -82,6 +77,22 @@ app.post('/api/persons', (request, response) => {
             response.json(savedPerson)
         })
     }
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const person = {
+      id: body.id,
+      name: body.name,
+      number: body.number
+    }
+  
+    Person.findByIdAndUpdate(request.params.id, person, { new: true })
+      .then(updatedPerson => {
+        response.json(updatedPerson)
+      })
+      .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
