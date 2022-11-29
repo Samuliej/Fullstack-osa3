@@ -46,24 +46,19 @@ app.get('/api/persons/:id', (request, response, next) => {
 })
 
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const personInfo = request.body    
 
-    if (!personInfo.name || !personInfo.number) {
-        response.status(400).json({
-            error: "Name or number must not be empty."
+    const person = new Person({
+        id: personInfo.id,
+        name: personInfo.name,
+        number: personInfo.number,
+    })
+
+    person.save().then(savedPerson => {
+        response.json(savedPerson)
         })
-    } else {
-        const person = new Person({
-            id: personInfo.id,
-            name: personInfo.name,
-            number: personInfo.number,
-        })
-        console.log(person)
-        person.save().then(savedPerson => {
-            response.json(savedPerson)
-        })
-    }
+        .catch(error => next(error))
 })
 
 
@@ -107,7 +102,10 @@ const errorHandler = (error, request, response, next) => {
 
     if (error.name === 'CastError') {
         return response.status(400).send({error: 'malformatted id'})
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).json( { error: error.message } )
     }
+    
     next(error)
 }
 
